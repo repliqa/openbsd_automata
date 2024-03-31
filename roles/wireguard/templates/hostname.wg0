@@ -1,0 +1,6 @@
+172.16.16.1/24 wgkey {{ server_private_key }} wgport 51820
+
+# peer configs
+# wgpeer peer_public_key wgaip 172.16.16.3/32
+
+!ifconfig wg0 debug
