@@ -1,0 +1,28 @@
+---
+- name: "install wireguard_tools (only for generating keypair)"
+  ansible.builtin.openbsd_pkg:
+    name: wireguard_tools
+  state: present
+
+- name: "generate private key"
+  ansible.builtin.shell: "mkdir /etc/wireguard && chown 700 /etc/wireguard && wg genkey | tee /etc/wireguard/privkey"
+  register: server_private_key
+
+- name: "generate public key"
+  ansible.builtin.shell: "echo {{ server_private_key.stdout }} | wg pubkey > /etc/wireguard/pubkey"
+  register: server_public_key
+
+- name: "template out files"
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - src: hostname.wg0.j2
+      dest: /etc/hostname.wg0
+    - src: pf.conf.j2
+      dest: /etc/pf.conf 
+    - src: sysctl.conf.j2
+      dest: /etc/sysctl.conf
+  notify:
+    - restart_wg_iface
+    - restart_obsd

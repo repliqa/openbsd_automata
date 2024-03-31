@@ -1,0 +1,7 @@
+---
+- name: restart_wg_iface
+  ansible.builtin.shell: "sh /etc/netstart wg0"
+
+- name: restart_obsd
+  ansible.builtin.debug:
+    msg: "Restart your server"
